@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מחולל משוב פדגוגי - סיכום מחצית</title>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #f0f4f8;
+            --accent-green: #76c893;
+            --accent-blue: #52b69a;
+            --text-dark: #2d3436;
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --white: #ffffff;
+            --pill-inactive: #e9ecef;
+        }
+
+        body {
+            font-family: 'Assistant', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            background: var(--white);
+            width: 100%;
+            max-width: 650px;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            border-top: 10px solid var(--accent-green);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--accent-blue);
+            font-size: 2rem;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 25px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #4a4a4a;
+        }
+
+        input {
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-family: 'Assistant', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .custom-input {
+            margin-top: 5px;
+            background-color: #fafafa;
+            border-style: dashed;
+        }
+
+        .pills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pill {
+            padding: 8px 16px;
+            background-color: var(--pill-inactive);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            user-select: none;
+            border: 2px solid transparent;
+        }
+
+        .pill.active {
+            background-color: var(--accent-green);
+            color: white;
+            border-color: var(--accent-green);
+        }
+
+        .gender-toggle {
+            display: flex;
+            gap: 10px;
+        }
+
+        .gender-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            background: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .gender-btn.active {
+            background-color: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        .generate-btn {
+            background-color: var(--accent-green);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .generate-btn:hover {
+            background-color: #5ab27d;
+            transform: translateY(-2px);
+        }
+
+        #output-section {
+            margin-top: 30px;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .feedback-box {
+            background-color: #f9fdfb;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px dashed var(--accent-green);
+            line-height: 1.8;
+            font-size: 1.15rem;
+        }
+
+        .actions {
+            margin-top: 15px;
+        }
+
+        .copy-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #e3f2fd;
+            color: #1976d2;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 30px;
+            display: none;
+            z-index: 1000;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-divider {
+            height: 1px;
+            background: #eee;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h1>מחולל משוב סיכום מחצית</h1>
+    
+    <div class="form-grid">
+        <div class="input-group">
+            <label>מגדר המורה (הכותב/ת)</label>
+            <div class="gender-toggle">
+                <button type="button" class="gender-btn active" id="teacher-male" onclick="setTeacherGender('male')">מורה (זכר)</button>
+                <button type="button" class="gender-btn" id="teacher-female" onclick="setTeacherGender('female')">מורה (נקבה)</button>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <div class="input-group">
+            <label>פנייה לתלמיד/ה</label>
+            <div class="gender-toggle">
+                <button type="button" class="gender-btn active" id="btn-male" onclick="setGender('male')">תלמיד (זכר)</button>
+                <button type="button" class="gender-btn" id="btn-female" onclick="setGender('female')">תלמידה (נקבה)</button>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="studentName">שם התלמיד/ה</label>
+            <input type="text" id="studentName" placeholder="הכנס שם...">
+        </div>
+
+        <div class="input-group">
+            <label for="grade">הערכת ממוצע כללית</label>
+            <select id="grade">
+                <option value="high">ממוצע גבוה (מעל 70)</option>
+                <option value="low">ממוצע המצריך שיפור (מתחת ל-70)</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>נקודות חוזק לאורך המחצית</label>
+            <div class="pills-container" id="strength-pills">
+                <div class="pill" data-value="excellence">שאיפה למצוינות</div>
+                <div class="pill" data-value="volunteering">התנדבות ומעורבות</div>
+                <div class="pill" data-value="participation">השתתפות פעילה</div>
+                <div class="pill" data-value="persistence">התמדה והשקעה</div>
+                <div class="pill" data-value="helpfulness">עזרה לחברים</div>
+                <div class="pill" data-value="curiosity">סקרנות לימודית</div>
+                <div class="pill" data-value="organization_s">סדר וארגון</div>
+                <div class="pill" data-value="creativity">חשיבה יצירתית</div>
+            </div>
+            <input type="text" id="custom-strength" class="custom-input" placeholder="הוסיפו חוזקה אישית נוספת...">
+        </div>
+
+        <div class="input-group">
+            <label>יעדים לשיפור להמשך הדרך</label>
+            <div class="pills-container" id="improvement-pills">
+                <div class="pill" data-value="effort">השקעת מאמץ</div>
+                <div class="pill" data-value="organization_i">שמירה על סדר וארגון</div>
+                <div class="pill" data-value="priorities">סדר עדיפויות</div>
+                <div class="pill" data-value="authority">קבלת סמכות</div>
+                <div class="pill" data-value="deadlines">עמידה בלוחות זמנים</div>
+                <div class="pill" data-value="focus">ריכוז בעבודה עצמית</div>
+                <div class="pill" data-value="engagement">הגברת השתתפות</div>
+                <div class="pill" data-value="detailing">פירוט בתשובות</div>
+            </div>
+            <input type="text" id="custom-improvement" class="custom-input" placeholder="הוסיפו יעד אישי נוסף...">
+        </div>
+
+        <button class="generate-btn" onclick="generateFeedback()">חולל משוב מחצית</button>
+    </div>
+
+    <div id="output-section">
+        <div class="feedback-box" id="feedback-text"></div>
+        <div class="actions">
+            <button class="copy-btn" onclick="copyResult()">העתק משוב ללוח</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast">הטקסט הועתק!</div>
+
+<script>
+    let currentGender = 'male';
+    let currentTeacherGender = 'male';
+
+    document.querySelectorAll('.pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+            pill.classList.toggle('active');
+        });
+    });
+
+    function setGender(gender) {
+        currentGender = gender;
+        document.getElementById('btn-male').classList.toggle('active', gender === 'male');
+        document.getElementById('btn-female').classList.toggle('active', gender === 'female');
+    }
+
+    function setTeacherGender(gender) {
+        currentTeacherGender = gender;
+        document.getElementById('teacher-male').classList.toggle('active', gender === 'male');
+        document.getElementById('teacher-female').classList.toggle('active', gender === 'female');
+    }
+
+    function formatList(items) {
+        if (items.length === 0) return "";
+        const list = [...items];
+        if (list.length === 1) return list[0];
+        const last = list.pop();
+        return list.join(", ") + " ו-" + last;
+    }
+
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function generateFeedback() {
+        const name = document.getElementById('studentName').value.trim();
+        const gradeType = document.getElementById('grade').value;
+        
+        const selectedStrengths = Array.from(document.querySelectorAll('#strength-pills .pill.active'))
+            .map(p => p.innerText);
+        
+        const selectedImprovements = Array.from(document.querySelectorAll('#improvement-pills .pill.active'))
+            .map(p => p.innerText);
+
+        const customStr = document.getElementById('custom-strength').value.trim();
+        const customImp = document.getElementById('custom-improvement').value.trim();
+        
+        if (customStr) selectedStrengths.push(customStr);
+        if (customImp) selectedImprovements.push(customImp);
+
+        if (!name || selectedStrengths.length === 0 || selectedImprovements.length === 0) {
+            alert("אנא מלאו שם ובחרו לפחות חוזקה אחת ויעד אחד לשיפור.");
+            return;
+        }
+
+        const isM = currentGender === 'male';
+        const isT = currentTeacherGender === 'male';
+        
+        // בנק משפטי פתיחה (חוזקות)
+        const openings = [
+            `${name} ${isM ? 'היקר' : 'היקרה'}, נהניתי מאוד לראות לאורך המחצית את ${formatList(selectedStrengths)}.`,
+            `${name} ${isM ? 'היקר' : 'היקרה'}, התרשמתי לטובה במהלך המחצית מהתמדתך ובעיקר מ${formatList(selectedStrengths)}.`,
+            `${name} ${isM ? 'היקר' : 'היקרה'}, בלטו לטובה לאורך כל המחצית האחרונה ${formatList(selectedStrengths)}.`,
+            `שמחתי ללוות אותך במחצית זו, ${name} ${isM ? 'היקר' : 'היקרה'}, ונוכחתי לראות מקרוב את ${formatList(selectedStrengths)}.`
+        ];
+
+        // בנק משפטי מעבר (יעדים)
+        const improvementStr = formatList(selectedImprovements);
+        const midLow = [
+            `הציון הממוצע שהושג משקף כי עלינו להציב יעדים חדשים. אני ${isT ? 'ממליץ' : 'ממליצה'} לך להתמקד ב${improvementStr} כדי להשתפר.`,
+            `הישגייך בממוצע המחצית מצביעים על כך שיש צורך בשיפור. כצעד הבא, כדאי לשים דגש על ${improvementStr}.`,
+            `ממוצע המחצית מהווה עבורנו נקודת זינוק לשיפור. לקראת המחצית הבאה, חשוב להקפיד על ${improvementStr}.`
+        ];
+
+        const midHigh = [
+            `הציון הממוצע משקף היטב את הישגייך ואת העבודה היפה שעשית. כדי להמשיך ולהתקדם, כדאי לתת תשומת לב ל${improvementStr}.`,
+            `ממוצע המחצית מבטא נאמנה את הידע שצברת. אני ${isT ? 'ממליץ' : 'ממליצה'} לך לשמר את ההצלחה ולהתמקד גם ב${improvementStr}.`,
+            `הישגייך הממוצעים מעידים על הבנה טובה של החומר. כדי להגיע רחוק אף יותר, אני ${isT ? 'ממליץ' : 'ממליצה'} לשפר את ה${improvementStr}.`
+        ];
+
+        // בנק משפטי סגירה (עידוד)
+        const closings = [
+            `אני ${isT ? 'מאמין' : 'מאמינה'} מאוד ביכולות שלך וגאה בדרך שאת${isM ? 'ה עושה' : ' עוברת'}!`,
+            `המשיכ${isM ? 'י' : 'י'} כך בכל הכוח. אני ${isT ? 'גאה' : 'גאה'} בך ומצפה לראות את המשך צמיחתך!`,
+            `כל הכבוד על המאמץ. אני ${isT ? 'בטוח' : 'בטוחה'} שתצליח${isM ? '' : 'י'} לעמוד בכל היעדים שתציב${isM ? 'י' : 'י'} לעצמך.`,
+            `אני ${isT ? 'מעריך' : 'מעריכה'} מאוד את הגישה שלך ומחכ${isT ? 'ה' : 'ה'} לראות אותך ממשיכ${isM ? 'י' : 'י'} להתקדם במחצית הבאה.`
+        ];
+
+        const part1 = getRandomItem(openings) + " ";
+        const part2 = (gradeType === 'low' ? getRandomItem(midLow) : getRandomItem(midHigh)) + " ";
+        const part3 = getRandomItem(closings);
+
+        document.getElementById('feedback-text').innerText = part1 + part2 + part3;
+        document.getElementById('output-section').style.display = 'block';
+    }
+
+    function copyResult() {
+        const text = document.getElementById('feedback-text').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 2000);
+        });
+    }
+</script>
+
+</body>
+</html>
