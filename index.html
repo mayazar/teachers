@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מחולל משוב פדגוגי - סיכום מחצית</title>
+    <title>ממני אלייך למורים</title>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -14,6 +14,9 @@
             --card-shadow: 0 10px 30px rgba(0,0,0,0.08);
             --white: #ffffff;
             --pill-inactive: #e9ecef;
+            --ai-purple: #9b59b6;
+            --danger-pastel: #fce4ec;
+            --danger-text: #d81b60;
         }
 
         body {
@@ -31,7 +34,7 @@
         .app-container {
             background: var(--white);
             width: 100%;
-            max-width: 650px;
+            max-width: 750px;
             padding: 40px;
             border-radius: 24px;
             box-shadow: var(--card-shadow);
@@ -41,7 +44,7 @@
         h1 {
             text-align: center;
             color: var(--accent-blue);
-            font-size: 2rem;
+            font-size: 2.2rem;
             margin-bottom: 30px;
             font-weight: 700;
         }
@@ -63,13 +66,12 @@
             color: #4a4a4a;
         }
 
-        input {
+        input, select {
             padding: 14px;
             border: 2px solid #e0e0e0;
             border-radius: 12px;
             font-family: 'Assistant', sans-serif;
             font-size: 1rem;
-            transition: border-color 0.3s;
         }
 
         input:focus {
@@ -129,7 +131,15 @@
             border-color: var(--accent-blue);
         }
 
+        /* Button Layout */
+        .main-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
         .generate-btn {
+            flex: 3;
             background-color: var(--accent-green);
             color: white;
             padding: 18px;
@@ -139,12 +149,29 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
-            margin-top: 10px;
         }
 
         .generate-btn:hover {
             background-color: #5ab27d;
             transform: translateY(-2px);
+        }
+
+        .reset-btn {
+            flex: 1;
+            background-color: var(--pill-inactive);
+            color: #7f8c8d;
+            padding: 18px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            background-color: #dfe6e9;
+            color: var(--text-dark);
         }
 
         #output-section {
@@ -160,10 +187,35 @@
             border: 2px dashed var(--accent-green);
             line-height: 1.8;
             font-size: 1.15rem;
+            min-height: 100px;
+            color: var(--text-dark);
         }
 
-        .actions {
+        .ai-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
             margin-top: 15px;
+        }
+
+        .ai-btn {
+            background-color: #f3e5f5;
+            color: var(--ai-purple);
+            border: 1px solid var(--ai-purple);
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .ai-btn:hover {
+            background-color: var(--ai-purple);
+            color: white;
         }
 
         .copy-btn {
@@ -175,19 +227,15 @@
             border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
+            margin-top: 10px;
         }
 
-        #toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 30px;
+        .loading-spinner {
             display: none;
-            z-index: 1000;
+            text-align: center;
+            margin: 10px 0;
+            color: var(--ai-purple);
+            font-weight: 600;
         }
 
         @keyframes fadeIn {
@@ -205,7 +253,7 @@
 <body>
 
 <div class="app-container">
-    <h1>מחולל משוב סיכום מחצית</h1>
+    <h1>ממני אלייך למורים</h1>
     
     <div class="form-grid">
         <div class="input-group">
@@ -234,22 +282,27 @@
         <div class="input-group">
             <label for="grade">הערכת ממוצע כללית</label>
             <select id="grade">
-                <option value="high">ממוצע גבוה (מעל 70)</option>
-                <option value="low">ממוצע המצריך שיפור (מתחת ל-70)</option>
+                <option value="v_high">מעל 80</option>
+                <option value="high">בין 75 - 80</option>
+                <option value="mid">בין 60 - 75</option>
+                <option value="low">מתחת ל-60</option>
             </select>
         </div>
 
         <div class="input-group">
             <label>נקודות חוזק לאורך המחצית</label>
             <div class="pills-container" id="strength-pills">
+                <div class="pill" data-value="friendly">חברותי/ת</div>
+                <div class="pill" data-value="well_liked">אהוב/ה על הבריות</div>
+                <div class="pill" data-value="polite">מנומס/ת</div>
+                <div class="pill" data-value="nice_atmosphere">משרה אווירה נעימה</div>
+                <div class="pill" data-value="respectful">בעל/ת דרך ארץ</div>
+                <div class="pill" data-value="ready_to_help">תמיד נכון/ה לעזור</div>
                 <div class="pill" data-value="excellence">שאיפה למצוינות</div>
                 <div class="pill" data-value="volunteering">התנדבות ומעורבות</div>
                 <div class="pill" data-value="participation">השתתפות פעילה</div>
                 <div class="pill" data-value="persistence">התמדה והשקעה</div>
-                <div class="pill" data-value="helpfulness">עזרה לחברים</div>
                 <div class="pill" data-value="curiosity">סקרנות לימודית</div>
-                <div class="pill" data-value="organization_s">סדר וארגון</div>
-                <div class="pill" data-value="creativity">חשיבה יצירתית</div>
             </div>
             <input type="text" id="custom-strength" class="custom-input" placeholder="הוסיפו חוזקה אישית נוספת...">
         </div>
@@ -257,39 +310,73 @@
         <div class="input-group">
             <label>יעדים לשיפור להמשך הדרך</label>
             <div class="pills-container" id="improvement-pills">
-                <div class="pill" data-value="effort">השקעת מאמץ</div>
-                <div class="pill" data-value="organization_i">שמירה על סדר וארגון</div>
-                <div class="pill" data-value="priorities">סדר עדיפויות</div>
-                <div class="pill" data-value="authority">קבלת סמכות</div>
-                <div class="pill" data-value="deadlines">עמידה בלוחות זמנים</div>
+                <div class="pill" data-value="punctuality">הגעה בזמן לשיעור</div>
+                <div class="pill" data-value="manners">נימוסים והליכות</div>
+                <div class="pill" data-value="diligence">שקידה על הלימודים</div>
+                <div class="pill" data-value="attendance">ביקור סדיר</div>
+                <div class="pill" data-value="dress_code">תלבושת נאותה</div>
+                <div class="pill" data-value="social_hours">השלמת שעות מעורבות</div>
+                <div class="pill" data-value="extra_effort">השקעת מאמץ להצלחה</div>
+                <div class="pill" data-value="proper_behavior">התנהגות נאותה</div>
+                <div class="pill" data-value="exam_integrity">טוהר הבחינות</div>
                 <div class="pill" data-value="focus">ריכוז בעבודה עצמית</div>
-                <div class="pill" data-value="engagement">הגברת השתתפות</div>
-                <div class="pill" data-value="detailing">פירוט בתשובות</div>
             </div>
             <input type="text" id="custom-improvement" class="custom-input" placeholder="הוסיפו יעד אישי נוסף...">
         </div>
 
-        <button class="generate-btn" onclick="generateFeedback()">חולל משוב מחצית</button>
+        <div class="main-actions">
+            <button class="generate-btn" id="main-generate-btn" onclick="generateFeedback()">חולל משוב שוטף</button>
+            <button class="reset-btn" onclick="resetForm()">נקה</button>
+        </div>
     </div>
 
     <div id="output-section">
         <div class="feedback-box" id="feedback-text"></div>
-        <div class="actions">
-            <button class="copy-btn" onclick="copyResult()">העתק משוב ללוח</button>
+        <div class="loading-spinner" id="ai-loading">✨ AI מלטש את המילים...</div>
+        <div class="ai-features">
+            <button class="ai-btn" onclick="polishWithAI()">✨ שדרג ניסוח (AI)</button>
+            <button class="ai-btn" onclick="suggestActivity()">✨ הצעה לפעילות (AI)</button>
         </div>
+        <button class="copy-btn" onclick="copyResult()">העתק משוב מוכן</button>
     </div>
 </div>
 
-<div id="toast">הטקסט הועתק!</div>
+<div id="toast" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#333; color:white; padding:10px 20px; border-radius:20px; display:none;">הטקסט הועתק!</div>
 
 <script>
+    const apiKey = "";
     let currentGender = 'male';
     let currentTeacherGender = 'male';
 
+    const strengthPhrases = {
+        friendly: { male: "היותך תלמיד חברותי מאוד", female: "היותך תלמידה חברותית מאוד" },
+        well_liked: { male: "העובדה שאתה אהוב על הבריות", female: "העובדה שאת אהובה על הבריות" },
+        polite: { male: "הנימוס והדרך הארץ שלך", female: "הנימוס והדרך הארץ שלך" },
+        nice_atmosphere: { male: "האווירה הנעימה שאתה משרה בכיתה", female: "האווירה הנעימה שאת משרה בכיתה" },
+        respectful: { male: "היותך בעל דרך ארץ למופת", female: "היותך בעלת דרך ארץ למופת" },
+        ready_to_help: { male: "הנכונות התמידית שלך לעזור", female: "הנכונות התמידית שלך לעזור" },
+        excellence: { male: "השאיפה הניכרת שלך למצוינות", female: "השאיפה הניכרת שלך למצוינות" },
+        volunteering: { male: "ההתנדבות והמעורבות החברתית שלך", female: "ההתנדבות והמעורבות החברתית שלך" },
+        participation: { male: "השתתפותך הפעילה בשיעורים", female: "השתתפותך הפעילה בשיעורים" },
+        persistence: { male: "התמדתך והשקעתך הרבה", female: "התמדתך והשקעתך הרבה" },
+        curiosity: { male: "הסקרנות הלימודית שאתה מפגין", female: "הסקרנות הלימודית שאת מפגינה" }
+    };
+
+    const improvementPhrases = {
+        punctuality: { male: "הקפדה על הגעה בזמן לשיעורים", female: "הקפדה על הגעה בזמן לשיעורים" },
+        manners: { male: "שמירה על נימוסים והליכות", female: "שמירה על נימוסים והליכות" },
+        diligence: { male: "העמקת השקידה על הלימודים", female: "העמקת השקידה על הלימודים" },
+        attendance: { male: "הקפדה על ביקור סדיר בבית הספר", female: "הקפדה על ביקור סדיר בבית הספר" },
+        dress_code: { male: "הקפדה על תלבושת נאותה", female: "הקפדה על תלבושת נאותה" },
+        social_hours: { male: "השלמת שעות המעורבות (שהיא תנאי לבגרות)", female: "השלמת שעות המעורבות (שהיא תנאי לבגרות)" },
+        extra_effort: { male: "השקעת מאמצים נוספים למען הצלחתך", female: "השקעת מאמצים נוספים למען הצלחתך" },
+        proper_behavior: { male: "הקפדה על התנהגות נאותה", female: "הקפדה על התנהגות נאותה" },
+        exam_integrity: { male: "שמירה על טוהר הבחינות", female: "שמירה על טוהר הבחינות" },
+        focus: { male: "שיפור הריכוז בעבודה עצמית", female: "שיפור הריכוז בעבודה עצמית" }
+    };
+
     document.querySelectorAll('.pill').forEach(pill => {
-        pill.addEventListener('click', () => {
-            pill.classList.toggle('active');
-        });
+        pill.addEventListener('click', () => pill.classList.toggle('active'));
     });
 
     function setGender(gender) {
@@ -304,89 +391,128 @@
         document.getElementById('teacher-female').classList.toggle('active', gender === 'female');
     }
 
-    function formatList(items) {
-        if (items.length === 0) return "";
-        const list = [...items];
-        if (list.length === 1) return list[0];
-        const last = list.pop();
-        return list.join(", ") + " ו-" + last;
-    }
+    function getRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-    function getRandomItem(arr) {
-        return arr[Math.floor(Math.random() * arr.length)];
+    function resetForm() {
+        document.getElementById('studentName').value = '';
+        document.getElementById('custom-strength').value = '';
+        document.getElementById('custom-improvement').value = '';
+        document.getElementById('grade').selectedIndex = 0;
+        document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+        document.getElementById('output-section').style.display = 'none';
+        document.getElementById('feedback-text').innerText = '';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function generateFeedback() {
         const name = document.getElementById('studentName').value.trim();
         const gradeType = document.getElementById('grade').value;
-        
-        const selectedStrengths = Array.from(document.querySelectorAll('#strength-pills .pill.active'))
-            .map(p => p.innerText);
-        
-        const selectedImprovements = Array.from(document.querySelectorAll('#improvement-pills .pill.active'))
-            .map(p => p.innerText);
+        const selectedStrengthKeys = Array.from(document.querySelectorAll('#strength-pills .pill.active')).map(p => p.getAttribute('data-value'));
+        const selectedImpKeys = Array.from(document.querySelectorAll('#improvement-pills .pill.active')).map(p => p.getAttribute('data-value'));
+        const customS = document.getElementById('custom-strength').value.trim();
+        const customI = document.getElementById('custom-improvement').value.trim();
 
-        const customStr = document.getElementById('custom-strength').value.trim();
-        const customImp = document.getElementById('custom-improvement').value.trim();
-        
-        if (customStr) selectedStrengths.push(customStr);
-        if (customImp) selectedImprovements.push(customImp);
-
-        if (!name || selectedStrengths.length === 0 || selectedImprovements.length === 0) {
-            alert("אנא מלאו שם ובחרו לפחות חוזקה אחת ויעד אחד לשיפור.");
-            return;
+        if (!name) { alert("אנא מלאו את שם התלמיד/ה."); return; }
+        if ((selectedStrengthKeys.length === 0 && !customS) || (selectedImpKeys.length === 0 && !customI)) {
+            alert("אנא בחרו לפחות חוזקה אחת ויעד אחד לשיפור."); return;
         }
 
         const isM = currentGender === 'male';
         const isT = currentTeacherGender === 'male';
-        
-        // בנק משפטי פתיחה (חוזקות)
-        const openings = [
-            `${name} ${isM ? 'היקר' : 'היקרה'}, נהניתי מאוד לראות לאורך המחצית את ${formatList(selectedStrengths)}.`,
-            `${name} ${isM ? 'היקר' : 'היקרה'}, התרשמתי לטובה במהלך המחצית מהתמדתך ובעיקר מ${formatList(selectedStrengths)}.`,
-            `${name} ${isM ? 'היקר' : 'היקרה'}, בלטו לטובה לאורך כל המחצית האחרונה ${formatList(selectedStrengths)}.`,
-            `שמחתי ללוות אותך במחצית זו, ${name} ${isM ? 'היקר' : 'היקרה'}, ונוכחתי לראות מקרוב את ${formatList(selectedStrengths)}.`
-        ];
+        const sPhrases = selectedStrengthKeys.map(k => strengthPhrases[k][currentGender]);
+        if (customS) sPhrases.push(customS);
+        const iPhrases = selectedImpKeys.map(k => improvementPhrases[k][currentGender]);
+        if (customI) iPhrases.push(customI);
 
-        // בנק משפטי מעבר (יעדים)
-        const improvementStr = formatList(selectedImprovements);
-        const midLow = [
-            `הציון הממוצע שהושג משקף כי עלינו להציב יעדים חדשים. אני ${isT ? 'ממליץ' : 'ממליצה'} לך להתמקד ב${improvementStr} כדי להשתפר.`,
-            `הישגייך בממוצע המחצית מצביעים על כך שיש צורך בשיפור. כצעד הבא, כדאי לשים דגש על ${improvementStr}.`,
-            `ממוצע המחצית מהווה עבורנו נקודת זינוק לשיפור. לקראת המחצית הבאה, חשוב להקפיד על ${improvementStr}.`
+        let intro = "";
+        const introTemplates = [
+            `${name} ${isM ? 'היקר' : 'היקרה'}, נהניתי מאוד לעקוב אחר תהליך הלמידה שלך במחצית האחרונה. `,
+            `שמחתי ללוות אותך במחצית זו, ${name} ${isM ? 'היקר' : 'היקרה'}, ולראות מקרוב את התקדמותך. `,
+            `${name} ${isM ? 'היקר' : 'היקרה'}, במהלך המחצית האחרונה בלטו לטובה היכולות המגוונות שאת${isM ? 'ה' : ''} מביא${isM ? '' : 'ת'} לכיתה. `
         ];
+        intro = getRandom(introTemplates);
 
-        const midHigh = [
-            `הציון הממוצע משקף היטב את הישגייך ואת העבודה היפה שעשית. כדי להמשיך ולהתקדם, כדאי לתת תשומת לב ל${improvementStr}.`,
-            `ממוצע המחצית מבטא נאמנה את הידע שצברת. אני ${isT ? 'ממליץ' : 'ממליצה'} לך לשמר את ההצלחה ולהתמקד גם ב${improvementStr}.`,
-            `הישגייך הממוצעים מעידים על הבנה טובה של החומר. כדי להגיע רחוק אף יותר, אני ${isT ? 'ממליץ' : 'ממליצה'} לשפר את ה${improvementStr}.`
-        ];
+        let strengthText = "";
+        if (sPhrases.length === 1) {
+            strengthText = `ניכר כי ${sPhrases[0]} מהווה נקודת חוזק משמעותית המאפיינת אותך. `;
+        } else if (sPhrases.length === 2) {
+            strengthText = `באופן מיוחד ראוי לציין את ${sPhrases[0]}, זאת לצד ${sPhrases[1]} שבולט/ת מאוד לטובה. `;
+        } else {
+            const first = sPhrases.slice(0, -1).join(", ");
+            const last = sPhrases[sPhrases.length - 1];
+            strengthText = `לאורך התקופה הפגנת ${first} וכן ${last}. מדובר בתכונות חשובות התורמות רבות לאקלים הכיתתי. `;
+        }
 
-        // בנק משפטי סגירה (עידוד)
+        let gradeText = "";
+        const midMsgs = {
+            low: ["הערכת הממוצע שהושגה במחצית זו מצביעה על צורך בשינוי גישה מהותי. ", "ההישגים בממוצע המחצית משקפים פערים הדורשים התייחסות רצינית ושיפור. "],
+            mid: ["הערכת הממוצע משקפת הבנה בסיסית של החומר, אך ניכר כי יש פוטנציאל רב שטרם מומש. ", "ההישגים בממוצע המחצית מהווים נקודת פתיחה טובה לשיפור לקראת ההמשך. "],
+            high: ["הערכת הממוצע משקפת עבודה עקבית, רצינות והבנה טובה מאוד של התכנים הנלמדים. ", "ממוצע המחצית מבטא נאמנה את ההשקעה הניכרת שלך ואת היכולות הגבוהות שהפגנת. "],
+            v_high: ["הערכת הממוצע המצוינת משקפת שליטה מלאה בחומר הנלמד והשקעה שהיא מעבר לנדרש. ", "ממוצע המחצית המעולה שלך הוא עדות ישירה למצוינות, יסודיות והתמדה ללא פשרות. "]
+        };
+        gradeText = getRandom(midMsgs[gradeType]);
+
+        let impText = "";
+        const recommend = isT ? "ממליץ" : "ממליצה";
+        if (iPhrases.length === 1) {
+            impText = `כדי להמשיך ולהשתדרג, אני ${recommend} לך לשים דגש מיוחד על ${iPhrases[0]} בהמשך הדרך. `;
+        } else {
+            const firstI = iPhrases.slice(0, -1).join(", ");
+            const lastI = iPhrases[iPhrases.length - 1];
+            impText = `לקראת המחצית הבאה, חשוב להתמקד ב${firstI} וכמו כן להקפיד על ${lastI}. `;
+        }
+
+        const believe = isT ? "מאמין" : "מאמינה";
         const closings = [
-            `אני ${isT ? 'מאמין' : 'מאמינה'} מאוד ביכולות שלך וגאה בדרך שאת${isM ? 'ה עושה' : ' עוברת'}!`,
-            `המשיכ${isM ? 'י' : 'י'} כך בכל הכוח. אני ${isT ? 'גאה' : 'גאה'} בך ומצפה לראות את המשך צמיחתך!`,
-            `כל הכבוד על המאמץ. אני ${isT ? 'בטוח' : 'בטוחה'} שתצליח${isM ? '' : 'י'} לעמוד בכל היעדים שתציב${isM ? 'י' : 'י'} לעצמך.`,
-            `אני ${isT ? 'מעריך' : 'מעריכה'} מאוד את הגישה שלך ומחכ${isT ? 'ה' : 'ה'} לראות אותך ממשיכ${isM ? 'י' : 'י'} להתקדם במחצית הבאה.`
+            `אני ${believe} מאוד ביכולות שלך וגאה בדרך שאת${isM ? 'ה עושה' : ' עוברת'}!`,
+            `יישר כוח על המאמץ שהשקעת. אני ${isT ? 'בטוח' : 'בטוחה'} שתצליח${isM ? '' : 'י'} לעמוד בכל היעדים שתציב${isM ? 'י' : 'י'} לעצמך.`,
+            `אני ${isT ? 'מעריך' : 'מעריכה'} מאוד את גישתך החיובית ומחכה לראות אותך ממשיך/כה להתפתח ולהצליח.`
         ];
+        const closing = getRandom(closings);
 
-        const part1 = getRandomItem(openings) + " ";
-        const part2 = (gradeType === 'low' ? getRandomItem(midLow) : getRandomItem(midHigh)) + " ";
-        const part3 = getRandomItem(closings);
-
-        document.getElementById('feedback-text').innerText = part1 + part2 + part3;
+        document.getElementById('feedback-text').innerText = intro + strengthText + gradeText + impText + closing;
         document.getElementById('output-section').style.display = 'block';
+    }
+
+    async function callGemini(prompt, systemInstruction = "") {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        const payload = { contents: [{ parts: [{ text: prompt }] }], systemInstruction: { parts: [{ text: systemInstruction }] } };
+        for (let i = 0; i < 3; i++) {
+            try {
+                const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const result = await response.json();
+                return result.candidates?.[0]?.content?.parts?.[0]?.text || null;
+            } catch (e) { await new Promise(r => setTimeout(r, 1000 * (i + 1))); }
+        }
+        return null;
+    }
+
+    async function polishWithAI() {
+        const box = document.getElementById('feedback-text');
+        const loader = document.getElementById('ai-loading');
+        loader.style.display = 'block';
+        const system = "You are a professional Israeli high school teacher. Rewrite the feedback to be fluent, professional, and warm. Use connectives like 'לצד זאת', 'יתרה מכך'. ADDRESS IN SECOND PERSON. NO LONG DASHES. Max 5 sentences.";
+        const res = await callGemini(`לטש את המשוב הבא שיהיה שוטף ומקצועי: ${box.innerText}`, system);
+        if (res) box.innerText = res.trim();
+        loader.style.display = 'none';
+    }
+
+    async function suggestActivity() {
+        const box = document.getElementById('feedback-text');
+        const loader = document.getElementById('ai-loading');
+        loader.style.display = 'block';
+        const res = await callGemini(`מבוסס על המשוב הזה, הצע פעילות קצרה אחת לשיפור בבית או בכיתה (בעברית): ${box.innerText}`, "Short practical pedagogical advice.");
+        if (res) box.innerText += "\n\n✨ הצעה לפעילות: " + res.trim();
+        loader.style.display = 'none';
     }
 
     function copyResult() {
         const text = document.getElementById('feedback-text').innerText;
-        navigator.clipboard.writeText(text).then(() => {
-            const toast = document.getElementById('toast');
-            toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 2000);
-        });
+        const temp = document.createElement('textarea'); temp.value = text; document.body.appendChild(temp);
+        temp.select(); document.execCommand('copy'); document.body.removeChild(temp);
+        const toast = document.getElementById('toast'); toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 2000);
     }
 </script>
-
 </body>
 </html>
